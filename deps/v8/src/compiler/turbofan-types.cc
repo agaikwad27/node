@@ -283,6 +283,7 @@ Type::bitset BitsetType::Lub(MapRefLike map, JSHeapBroker* broker) {
     case JS_ITERATOR_TAKE_HELPER_TYPE:
     case JS_ITERATOR_DROP_HELPER_TYPE:
     case JS_ITERATOR_FLAT_MAP_HELPER_TYPE:
+    case JS_ITERATOR_CONCAT_HELPER_TYPE:
     case JS_VALID_ITERATOR_WRAPPER_TYPE:
     case JS_FINALIZATION_REGISTRY_TYPE:
     case JS_WEAK_MAP_TYPE:
@@ -933,15 +934,15 @@ Type Type::Constant(JSHeapBroker* broker, ObjectRef ref, Zone* zone) {
   if (ref.IsSmi()) {
     return Constant(static_cast<double>(ref.AsSmi()), zone);
   }
-  if (ref.HoleType() != HoleType::kNone) {
-    return Type::Hole();
-  }
   if (ref.IsString() && !ref.IsInternalizedString()) {
     return Type::String();
   }
   if (ref.IsJSPrimitiveWrapper() &&
       ref.AsJSPrimitiveWrapper().IsStringWrapper(broker)) {
     return Type::StringWrapper();
+  }
+  if (ref.HoleType() != HoleType::kNone) {
+    return Type::Hole();
   }
   if (ref.IsJSTypedArray()) {
     return Type::TypedArray();
